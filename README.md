@@ -32,7 +32,7 @@ int dec_target(int a, float b) {
     return (int)(a*b);
 }
 
-int dec_decorator(int(*pfunc)(int, float), int a, float b) {
+int dec_decoration(int(*pfunc)(int, float), int a, float b) {
     std::cout << "decoration_begin" << std::endl;
     auto result = pfunc(a, b) * 10;
     std::cout << "decoration_end" << std::endl;
@@ -41,7 +41,7 @@ int dec_decorator(int(*pfunc)(int, float), int a, float b) {
 
 void dec_testrun() {
     Decorator<int, int, float> d(dec_target);
-    d.SetDecoration(dec_decorator);
+    d.SetDecoration(dec_decoration);
     std::cout << d(10, 5.5) << std::endl;
 }
 
