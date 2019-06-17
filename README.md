@@ -2,7 +2,10 @@
 
 ## Singleton 01
 
-```
+
+```cpp
+#include "singleton1.h"
+
 class ExampleClass{
   ...
   ExampleClass();
