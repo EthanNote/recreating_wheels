@@ -46,3 +46,51 @@ void dec_testrun() {
 }
 
 ```
+
+
+```cpp
+#include "decorator.h"
+
+typedef Decorator<int, std::string, std::string> response;
+
+int controller_a(std::string, std::string) {
+	return 200;
+}
+
+int controller_b(std::string, std::string) {
+	return 404;
+}
+
+int do_response(		
+	int (*controller)(std::string, std::string), 
+	std::string request_method, 
+	std::string request_data) {	
+		
+	int status = controller(request_method, request_method);
+	if (status != 200) {
+		std::cout << "SEND ERROR PAGE" << std::endl;
+	}
+	else {
+		std::cout << "200 OK" << std::endl;
+	}
+	return status;
+}
+class Router {
+	std::map<std::string, response*> route;
+	response* empty_response;
+public:
+	void init() {
+		route[std::string("/index")] = &((new response(controller_a))->SetDecoration(do_response));
+		empty_response = &((new response(controller_b))->SetDecoration(do_response));
+	}
+
+	void do_route(std::string url, std::string method, std::string request_data) {
+		auto response = route[url];
+		if (!response) {
+			response = empty_response;
+		}
+		(*response)(method, request_data);
+	}
+};
+
+```
