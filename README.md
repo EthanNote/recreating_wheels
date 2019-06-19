@@ -23,74 +23,30 @@ void get_singleton_b(){
 ```
 
 ### Decorator 01
-
 ```cpp
 #include "decorator.h"
+#include<chrono>
+#include<iostream>
 
-int dec_target(int a, float b) {
-    std::cout << "decorated_target" << std::endl;
-    return (int)(a*b);
+
+int test_routine(int(*test_target)(int, int), int a, int b) {
+	auto start = std::chrono::high_resolution_clock::now();
+	auto result = test_target(a, b);
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = end - start;
+	std::cout << duration.count() << "ns" << std::endl;
+	return result;
 }
 
-int dec_decoration(int(*pfunc)(int, float), int a, float b) {
-    std::cout << "decoration_begin" << std::endl;
-    auto result = pfunc(a, b) * 10;
-    std::cout << "decoration_end" << std::endl;
-    return result;
+int DECOFUNC(test_target)(int a, int b) {
+	return a + b;
 }
 
-void dec_testrun() {
-    Decorator<int, int, float> d(dec_target);
-    d.SetDecoration(dec_decoration);
-    std::cout << d(10, 5.5) << std::endl;
+
+DECORATE(test_target, test_routine)
+
+int main() {
+	std::cout << test_target(100, 200) << std::endl;
+	return 0;
 }
-
-```
-
-
-```cpp
-#include "decorator.h"
-
-typedef Decorator<int, std::string, std::string> response;
-
-int controller_a(std::string, std::string) {
-	return 200;
-}
-
-int controller_b(std::string, std::string) {
-	return 404;
-}
-
-int do_response(		
-	int (*controller)(std::string, std::string), 
-	std::string request_method, 
-	std::string request_data) {	
-		
-	int status = controller(request_method, request_method);
-	if (status != 200) {
-		std::cout << "SEND ERROR PAGE" << std::endl;
-	}
-	else {
-		std::cout << "200 OK" << std::endl;
-	}
-	return status;
-}
-class Router {
-	std::map<std::string, response*> route;
-	response* empty_response;
-public:
-	void init() {
-		route[std::string("/index")] = &((new response(controller_a))->SetDecoration(do_response));
-		empty_response = &((new response(controller_b))->SetDecoration(do_response));
-	}
-
-	void do_route(std::string url, std::string method, std::string request_data) {
-		auto response = route[url];
-		if (!response) {
-			response = empty_response;
-		}
-		(*response)(method, request_data);
-	}
-};
-
 ```
